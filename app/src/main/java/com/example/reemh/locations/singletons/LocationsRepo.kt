@@ -37,22 +37,15 @@ object LocationsRepo {
                 }
                 .filter { it.accuracy <= 100 }
 
-        val allSamples = samplesLiveData.value ?: mutableListOf()
-        allSamples.addAll(newSamples)
-
-        processNewSamples(context, allSamples)
+        processNewSamples(context, addToSamples(newSamples))
     }
 
     fun addServiceStart(service: Service) {
-        val allSamples = samplesLiveData.value ?: mutableListOf()
-        allSamples.add(LocationSampling(.0,.0,.0, Date().time))
-        processNewSamples(service, allSamples)
+        processNewSamples(service, addToSamples(listOf(LocationSampling(0.0,0.0,0.0, Date().time))))
     }
 
     fun addServiceEnd(service: Service) {
-        val allSamples = samplesLiveData.value ?: mutableListOf()
-        allSamples.add(LocationSampling(100.0,100.0,.0, Date().time))
-        processNewSamples(service, allSamples)
+        processNewSamples(service, addToSamples(listOf(LocationSampling(100.0,100.0,100.0, Date().time))))
     }
 
 
@@ -60,8 +53,14 @@ object LocationsRepo {
         processNewSamples(context, mutableListOf())
     }
 
+    private fun addToSamples(new: List<LocationSampling>): MutableList<LocationSampling> {
+        val allSamples = samplesLiveData.value?.toMutableList() ?: mutableListOf() // copy
+        allSamples.addAll(new)
+        return allSamples
+    }
+
     private fun processNewSamples(context: Context, samples: MutableList<LocationSampling>) {
         context.spPutString("locations", Gson().toJson(LocationSamplingContainer(samples)))
-        samplesLiveData.postValue(samples)
+        samplesLiveData.postValue(samples.toMutableList()) // copy
     }
 }

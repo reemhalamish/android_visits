@@ -25,7 +25,6 @@ class LocationCaptureService : Service(), GoogleApiClient.ConnectionCallbacks, G
 
     private lateinit var locationClient: GoogleApiClient
     private val locationRequest = LocationRequest()
-    private val isHighAccuracy = false
     private var didStart = false
 
 
@@ -77,13 +76,18 @@ class LocationCaptureService : Service(), GoogleApiClient.ConnectionCallbacks, G
 
     private fun initLocationsCapturing() {
         logd("initLocationsCapturing")
-        locationRequest.interval = 1000 * 60 * 5
-        locationRequest.fastestInterval = 1000 * 60
-        locationRequest.smallestDisplacement = 20f
-        locationRequest.maxWaitTime = 1000 * 60 * 60 * 2
-        locationRequest.priority =
-                if (isHighAccuracy) LocationRequest.PRIORITY_HIGH_ACCURACY
-                else LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+        locationRequest.interval = 1000 * 5
+        locationRequest.fastestInterval = 1000 * 1
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+//        locationRequest.maxWaitTime = 1000 * 10
+        //        locationRequest.smallestDisplacement = 20f
+
+//        locationRequest.interval = 1000 * 60 * 5
+//        locationRequest.fastestInterval = 1000 * 60
+//        locationRequest.smallestDisplacement = 20f
+//        locationRequest.maxWaitTime = 1000 * 60 * 60 * 2
+//        locationRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+
 
 
         locationClient = GoogleApiClient.Builder(this)
