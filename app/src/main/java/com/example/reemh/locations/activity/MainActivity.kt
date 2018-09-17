@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.widget.Toast
 import com.example.reemh.locations.background.LocationCaptureService
@@ -32,7 +33,7 @@ companion object {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), REQUEST_FINE_LOCATION)
             return
         } else {
-            startService(Intent(this, LocationCaptureService::class.java))
+            ContextCompat.startForegroundService(this, Intent(this, LocationCaptureService::class.java))
         }
     }
 

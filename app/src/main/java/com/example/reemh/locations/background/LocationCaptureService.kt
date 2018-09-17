@@ -1,12 +1,19 @@
 package com.example.reemh.locations.background
 
 import android.Manifest
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.NotificationCompat
+import com.example.reemh.locations.R
 import com.example.reemh.locations.extensions.logd
 import com.example.reemh.locations.singletons.LocationsRepo
 import com.google.android.gms.common.ConnectionResult
@@ -16,10 +23,10 @@ import com.google.android.gms.location.*
 
 class LocationCaptureService : Service(), GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    lateinit var locationClient: GoogleApiClient
-    val locationRequest = LocationRequest()
-    val isHighAccuracy = true
-    var didStart = false
+    private lateinit var locationClient: GoogleApiClient
+    private val locationRequest = LocationRequest()
+    private val isHighAccuracy = false
+    private var didStart = false
 
 
     override fun onCreate() {
@@ -30,10 +37,11 @@ class LocationCaptureService : Service(), GoogleApiClient.ConnectionCallbacks, G
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         logd("onStartCommand")
         if (didStart) {
-            logd("already started. ignoring placing locations request")
+            logd("already started. ignoring new onStartCommand")
         } else {
+            startWithNotification()
             initLocationsCapturing()
-        didStart = true
+            didStart = true
         }
 
         return START_STICKY_COMPATIBILITY
@@ -41,7 +49,33 @@ class LocationCaptureService : Service(), GoogleApiClient.ConnectionCallbacks, G
 
     override fun onBind(intent: Intent): IBinder? = null
 
-    fun initLocationsCapturing() {
+    private fun startWithNotification() {
+        val notificationBuilder: NotificationCompat.Builder
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationManager = getSystemService(NotificationManager::class.java) ?: return
+
+            val channel = NotificationChannel("locations", "locations", NotificationManager.IMPORTANCE_DEFAULT)
+            channel.description = "location updates"
+            notificationManager.createNotificationChannel(channel)
+
+            notificationBuilder = NotificationCompat.Builder(this, channel.id)
+                    .setAutoCancel(false)
+
+        } else {
+            notificationBuilder = NotificationCompat.Builder(this)
+                    .setAutoCancel(true)
+        }
+
+        val notification = notificationBuilder
+                .setContentTitle("location updates")
+                .setContentText("catching location updates")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .build()
+
+        startForeground(1234, notification)
+    }
+
+    private fun initLocationsCapturing() {
         logd("initLocationsCapturing")
         locationRequest.interval = 1000 * 60 * 5
         locationRequest.fastestInterval = 1000 * 60
