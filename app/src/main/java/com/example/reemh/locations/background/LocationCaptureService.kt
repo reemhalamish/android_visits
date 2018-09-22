@@ -84,7 +84,6 @@ class LocationCaptureService : Service(), GoogleApiClient.ConnectionCallbacks, G
 
         locationRequest.interval = 1000 * 60 * 5
         locationRequest.fastestInterval = 1000 * 60
-        locationRequest.smallestDisplacement = 20f
         locationRequest.maxWaitTime = 1000 * 60 * 60 * 2
         locationRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
 
