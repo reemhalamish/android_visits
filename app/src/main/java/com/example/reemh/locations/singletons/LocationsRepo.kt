@@ -63,4 +63,10 @@ object LocationsRepo {
         context.spPutString("locations", Gson().toJson(LocationSamplingContainer(samples)))
         samplesLiveData.postValue(samples.toMutableList()) // copy
     }
+
+    // todo synchronized
+    private fun makeNewVisitsIfExist(context: Context, samples: MutableList<LocationSampling>) {
+        // iterate all samples, find samples that include location that were finished, fire "visit end" and delete samples
+        // iterate all left samples, find samples of "visit start" and (if not fired already) fire "visit started"
+    }
 }
